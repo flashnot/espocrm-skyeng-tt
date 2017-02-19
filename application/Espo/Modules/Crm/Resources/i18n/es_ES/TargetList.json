@@ -1,0 +1,34 @@
+{
+  "fields": {
+    "name": "Nombre",
+    "description": "Descripción",
+    "entryCount": "Contador de entrada",
+    "campaigns": "Campañas",
+    "endDate": "Fecha de Fin",
+    "targetLists": "Lista de Objetivos",
+    "includingActionList": "Incluyendo",
+    "excludingActionList": "Excluyendo"
+  },
+  "links": {
+    "accounts": "Cuentas",
+    "contacts": "Contactos",
+    "leads": "Posibles Clientes",
+    "campaigns": "Campañas",
+    "massEmails": "Correos Masivos"
+  },
+  "options": {
+    "type": {
+      "Email": "Correo electrónico",
+      "Web": "Web",
+      "Television": "Televisión",
+      "Radio": "Radio",
+      "Newsletter": "Boletín de noticias"
+    }
+  },
+  "labels": {
+    "Create TargetList": "Crear un objetivo de lista",
+    "Opted Out": "Se dieron de baja",
+    "Cancel Opt-Out": "Cancelar Opt-Out",
+    "Opt-Out": "Opt-Out"
+  }
+}

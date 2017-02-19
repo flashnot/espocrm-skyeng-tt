@@ -1,0 +1,40 @@
+{
+  "fields": {
+    "action": "Acción",
+    "actionDate": "Fecha",
+    "data": "Datos",
+    "campaign": "Campaña",
+    "parent": "Objetivo",
+    "object": "Objeto",
+    "application": "Aplicacion",
+    "queueItem": "Item de Cola",
+    "stringData": "Cadena de datos",
+    "stringAdditionalData": "Cadena de datos adicional"
+  },
+  "links": {
+    "queueItem": "Cola de artículos",
+    "parent": "Padre",
+    "object": "Objeto"
+  },
+  "options": {
+    "action": {
+      "Sent": "Enviado",
+      "Opened": "Abierto",
+      "Opted Out": "Se dieron de baja",
+      "Bounced": "Rebotados",
+      "Clicked": "Cliqueados",
+      "Lead Created": "Posible Cliente Creado"
+    }
+  },
+  "labels": {
+    "All": "Todos"
+  },
+  "presetFilters": {
+    "sent": "Enviados",
+    "opened": "Abierto",
+    "optedOut": "Se dieron de baja",
+    "bounced": "Rebotados",
+    "clicked": "Cliqueados",
+    "leadCreated": "Posible Cliente Creado"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "fields": {
+    "name": "Nombre",
+    "status": "Estado",
+    "isHtml": "Es Html",
+    "body": "Cuerpo",
+    "subject": "Asunto",
+    "attachments": "Adjuntos",
+    "insertField": "Insertar Campo",
+    "oneOff": "Único"
+  },
+  "labels": {
+    "Create EmailTemplate": "Crear Plantilla de Correo",
+    "Info": "Información"
+  },
+  "messages": {
+    "infoText": "Variables disponibles:\n\n{optOutUrl} &#8211; URL del enlace de baja.\n\n{optOutLink} &#8211;  Enlace de baja."
+  },
+  "tooltips": {
+    "oneOff": "Marque la casilla si usted va a utilizar esta plantilla solo una vez. Por ejemplo: para Correo Masivo."
+  },
+  "presetFilters": {
+    "actual": "Actuales"
+  }
+}
