@@ -57,7 +57,7 @@ class HiEmail extends \Espo\Services\Record
 
     protected function send($entity)
     {
-        $to => $entity->get('to');
+        $to = $entity->get('to');
         
         if (empty($to) || strpos($to, '@') === false) {         
             throw new Error("Destanation email is empty", 404);
