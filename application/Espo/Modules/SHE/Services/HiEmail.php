@@ -55,101 +55,68 @@ class HiEmail extends \Espo\Services\Record
         return $this->injections['serviceFactory'];
     }
 
-    protected function send(Entities\Email $entity)
+    protected function send($entity)
     {
+        $to => $entity->get('to');
+        
+        if (empty($to) || strpos($to, '@') === false) {         
+            throw new Error("Destanation email is empty", 404);
+        }
+        
+        $smtpParams = $this->getPreferences()->getSmtpParams();
+        if (empty($smtpParams)) {
+            $smtpParams = $this->getSmtpParamsFromEmailAccount('no-reply@espocrm.dmigus.com', $this->getUser()->id);
+        }
+        
+        if ($smtpParams) {
+            if (array_key_exists('password', $smtpParams)) {
+                $smtpParams['password'] = $this->getCrypt()->decrypt($smtpParams['password']);
+            }
+        }
+        
+        if (!$smtpParams) {
+            throw new Error('Can not use system smtp. System SMTP is not shared.');
+        }
+        
         $emailSender = $this->getMailSender();
-
-        $userAddressList = [];
-        foreach ($this->getUser()->get('emailAddresses') as $ea) {
-            $userAddressList[] = $ea->get('lower');
+        $emailSender->useSmtp($smtpParams);
+        
+        /*if (strpos($data['to'], ';') !== false) {
+            $ea = explode(';', $data['to']);
+            
+            $to = array_shift($ea);
+            $bcc = count($ea) > 0 ? implode(';', $ea) : null;
+        } else {
+            $to = $data['to'];
+            $bcc = null;
+        }*/
+        
+        $emailTemplate = $this->getEntityManager()->getRepository('EmailTemplate')->get('58aab71ea99715007');
+        
+        if (!empty($emailTemplate)) {
+            $subject = $emailTemplate->get('subject');
+            $body = $emailTemplate->get('body');
+            $isHtml = $emailTemplate->get('isHtml');
+        } else {
+            $subject = 'Hi for Skyeng from Gusakov D.A. !';
+            $body = 'Привет для Skyeng от Гусакова Д.А.';
+            $isHtml = false;
         }
-
-        $primaryUserAddress = strtolower($this->getUser()->get('emailAddress'));
-        $fromAddress = strtolower($entity->get('from'));
-
-        if (empty($fromAddress)) {
-            throw new Error();
-        }
-
-        $smtpParams = null;
-        if (in_array($fromAddress, $userAddressList)) {
-            if ($primaryUserAddress === $fromAddress) {
-                $smtpParams = $this->getPreferences()->getSmtpParams();
-            }
-            if (!$smtpParams) {
-                $smtpParams = $this->getSmtpParamsFromEmailAccount($entity->get('from'), $this->getUser()->id);
-            }
-
-            if ($smtpParams) {
-                if (array_key_exists('password', $smtpParams)) {
-                    $smtpParams['password'] = $this->getCrypt()->decrypt($smtpParams['password']);
-                }
-                $smtpParams['fromName'] = $this->getUser()->get('name');
-                $emailSender->useSmtp($smtpParams);
-            }
-        }
-
-        if (!$smtpParams && $fromAddress === strtolower($this->getConfig()->get('outboundEmailFromAddress'))) {
-            if (!$this->getConfig()->get('outboundEmailIsShared')) {
-                throw new Error('Can not use system smtp. System SMTP is not shared.');
-            }
-            $emailSender->setParams(array(
-                'fromName' => $this->getUser()->get('name')
-            ));
-        }
-
-        $params = array();
-
-        $parent = null;
-        if ($entity->get('parentType') && $entity->get('parentId')) {
-            $parent = $this->getEntityManager()->getEntity($entity->get('parentType'), $entity->get('parentId'));
-            if ($parent) {
-                if ($entity->get('parentType') == 'Case') {
-                    if ($parent->get('inboundEmailId')) {
-                        $inboundEmail = $this->getEntityManager()->getEntity('InboundEmail', $parent->get('inboundEmailId'));
-                        if ($inboundEmail && $inboundEmail->get('replyToAddress')) {
-                            $params['replyToAddress'] = $inboundEmail->get('replyToAddress');
-                        }
-                    }
-                }
-            }
-        }
-
-        $message = null;
-
+        
+        $email = $this->getEntityManager()->getEntity('Email');
+        $email->set([
+            'subject'    => $subject,
+            'isHtml'    => $isHtml,
+            'to'        => $to,            //TODO: все получатели видят кому ещё было отправлено письмо :( Варианты - а) подставлять to в цикле, б) использовать bcc
+            //'bcc'        => $bcc,
+            'body'        => $body
+        ]);
+        
         try {
-            $emailSender->send($entity, $params, $message);
+            $emailSender->send($email);
         } catch (\Exception $e) {
-            $entity->set('status', 'Failed');
-            $this->getEntityManager()->saveEntity($entity, array(
-                'silent' => true
-            ));
             throw new Error($e->getMessage(), $e->getCode());
         }
-
-        if ($entity->get('from') && $message) {
-            $emailAccount = $this->getEntityManager()->getRepository('EmailAccount')->where(array(
-                'storeSentEmails' => true,
-                'emailAddress' => $entity->get('from'),
-                'assignedUserId' => $this->getUser()->id
-            ))->findOne();
-            if ($emailAccount) {
-                try {
-                    $emailAccountService = $this->getServiceFactory()->create('EmailAccount');
-                    $emailAccountService->storeSentMessage($emailAccount, $message);
-                } catch (\Exception $e) {
-                    $GLOBALS['log']->error("Could not store sent email (Email Account {$emailAccount->id}): " . $e->getMessage());
-                }
-            }
-        }
-
-        if ($parent) {
-            $this->getStreamService()->noteEmailSent($parent, $entity);
-        }
-
-        $entity->set('isJustSent', true);
-
-        $this->getEntityManager()->saveEntity($entity);
     }
 
     protected function getSmtpParamsFromEmailAccount($address, $userId)
@@ -189,27 +156,20 @@ class HiEmail extends \Espo\Services\Record
     {
         $entity = parent::createEntity($data);
 
-        if ($entity && $entity->get('status') == 'Sending') {
-            $this->send($entity);
+        if ($entity) {
+            try {
+                $this->send($entity);
+            } catch (\Exception $e) {
+                $this->getEntityManager()->removeEntity($entity);
+                throw new Error($e->getMessage(), $e->getCode());
+            }
         }
 
         return $entity;
     }
 
-    protected function beforeCreate(Entity $entity, array $data = array())
-    {
-        if ($entity->get('status') == 'Sending') {
-            $messageId = \Espo\Core\Mail\Sender::generateMessageId($entity);
-            $entity->set('messageId', '<' . $messageId . '>');
-        }
-    }
-
     protected function afterUpdate(Entity $entity, array $data = array())
     {
-        if ($entity && $entity->get('status') == 'Sending') {
-            $this->send($entity);
-        }
-
         $this->loadAdditionalFields($entity);
     }
 
@@ -308,7 +268,7 @@ class HiEmail extends \Espo\Services\Record
     }
 
 
-    public function loadNameHash(Entity $entity, array $fieldList = ['from', 'to', 'cc'])
+    public function loadNameHash(Entity $entity, array $fieldList = ['to'])
     {
         $this->getEntityManager()->getRepository('Email')->loadNameHash($entity, $fieldList);
     }
@@ -337,20 +297,4 @@ class HiEmail extends \Espo\Services\Record
 
         return $selectParams;
     }
-
-    public function sendTestEmail($data)
-    {
-        $email = $this->getEntityManager()->getEntity('HiEmail');
-
-        $email->set(array(
-            'subject' => 'EspoCRM: Test Email',
-            'to' => $data['emailAddress']
-        ));
-
-        $emailSender = $this->getMailSender();
-        $emailSender->useSmtp($data)->send($email);
-
-        return true;
-    }
 }
-
