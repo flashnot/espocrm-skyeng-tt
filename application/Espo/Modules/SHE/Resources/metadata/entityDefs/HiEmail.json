@@ -1,0 +1,47 @@
+{
+   "fields":{
+      "to":{
+         "type":"varchar",
+         "view": "she:views/hi-email/fields/email-address-varchar",
+         "required":true
+      },
+      "toEmailAddresses": {
+         "type": "linkMultiple"
+      },
+      "createdAt":{
+         "type":"datetime",
+         "readOnly":true
+      },
+      "createdBy":{
+         "type":"link",
+         "readOnly":true
+      }
+   },
+   "links":{
+      "createdBy":{
+         "type":"belongsTo",
+         "entity":"User"
+      },
+      "toEmailAddresses": {
+         "type": "hasMany",
+         "entity": "EmailAddress",
+         "relationName": "hiEmailEmailAddress",
+         "conditions": {
+            "addressType": "to"
+         },
+         "additionalColumns": {
+            "addressType": {
+               "type": "varchar",
+               "len": "4"
+            }
+         }
+      }
+   },
+   "collection":{
+      "sortBy":"createdAt",
+      "asc":false,
+      "boolFilters":[
+         "onlyMy"
+      ]
+   }
+}

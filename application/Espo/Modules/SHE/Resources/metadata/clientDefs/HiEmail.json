@@ -1,0 +1,10 @@
+{
+  "controller": "Controllers.Record",
+  "recordViews":{
+    "list":"she:views/hi-email/record/list",
+    "detail":"she:views/hi-email/record/detail",
+    "detailQuick":"she:views/hi-email/record/detail-quick",
+    "edit":"she:views/hi-email/record/edit",
+    "editQuick":"she:views/hi-email/record/edit-quick"
+  }
+}
