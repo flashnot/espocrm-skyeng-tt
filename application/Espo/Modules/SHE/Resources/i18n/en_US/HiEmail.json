@@ -1,0 +1,14 @@
+{
+   "labels":{
+      "Create HiEmail":"Send HiEmail",
+      "create":"Send",
+      "to": "To",
+      "To": "To",
+      "save": "send",
+      "Save": "Send"
+   },
+   "fields":{
+      "to":"To",
+      "To":"To"
+   }
+}

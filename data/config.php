@@ -1,6 +1,6 @@
 <?php
 return [
-    'cacheTimestamp' => 1487547552,
+    'cacheTimestamp' => 1487568281,
     'database' => [
         'driver' => 'pdo_mysql',
         'dbname' => 'espocrm',
@@ -72,20 +72,23 @@ return [
     'tabList' => [
         0 => 'Account',
         1 => 'Contact',
-        2 => 'Lead',
-        3 => 'Opportunity',
-        4 => 'Case',
-        5 => 'Email',
-        6 => 'Calendar',
-        7 => 'Meeting',
-        8 => 'Call',
-        9 => 'Task',
-        10 => '_delimiter_',
+        2 => 'HiEmail',
+        3 => 'Lead',
+        4 => 'Opportunity',
+        5 => 'Case',
+        6 => 'Email',
+        7 => 'Calendar',
+        8 => 'Meeting',
+        9 => 'Call',
+        10 => 'Task',
         11 => 'Document',
         12 => 'Campaign',
         13 => 'KnowledgeBaseArticle',
         14 => 'Stream',
-        15 => 'User'
+        15 => 'User',
+        16 => 'TargetList',
+        17 => 'EmailTemplate',
+        18 => '_delimiter_'
     ],
     'quickCreateList' => [
         0 => 'Account',
@@ -182,6 +185,11 @@ return [
     'isInstalled' => true,
     'siteUrl' => 'http://espocrm.dmigus.com',
     'passwordSalt' => '21b03f9295073fcb',
-    'cryptKey' => '9582a330976000bfd5976e949d43d017'
+    'cryptKey' => '9582a330976000bfd5976e949d43d017',
+    'avatarsDisabled' => false,
+    'userThemesDisabled' => false,
+    'dashletsOptions' => (object) [
+        
+    ]
 ];
 ?>

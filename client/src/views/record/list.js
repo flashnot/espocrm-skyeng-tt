@@ -964,7 +964,7 @@ Espo.define('views/record/list', 'view', function (Dep) {
 
         buildRow: function (i, model, callback) {
             var key = model.id;
-
+            
             this.rowList.push(key);
             this.getInternalLayout(function (internalLayout) {
                 internalLayout = Espo.Utils.cloneDeep(internalLayout);

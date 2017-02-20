@@ -2,3 +2,5 @@
 /.idea/*
 /data/cache/*
 /data/logs/*
+/data/.backup/*
+/data/upload/*
